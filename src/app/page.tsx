@@ -116,10 +116,17 @@ function DoseCard({
   const done = status === "taken";
   const skipped = status === "skipped";
   return (
-    <div
-      className={`flex items-center gap-3 rounded-2xl bg-[var(--card)] border p-3 transition ${
-        done ? "border-[var(--good)]/40" : skipped ? "opacity-60" : "border-[var(--line)]"
+    <button
+      onClick={onTake}
+      className={`w-full text-left flex items-center gap-3 rounded-2xl border p-3 transition active:scale-[.98] ${
+        done
+          ? "bg-[var(--good)]/10 border-[var(--good)]"
+          : skipped
+          ? "bg-[var(--card)] opacity-55 border-[var(--line)]"
+          : "bg-[var(--card)] border-[var(--line)]"
       }`}
+      aria-pressed={done}
+      aria-label={done ? `${med.name} taken — tap to undo` : `Tap to mark ${med.name} taken`}
     >
       <div
         className="h-11 w-11 rounded-xl flex items-center justify-center text-white text-lg shrink-0"
@@ -135,33 +142,39 @@ function DoseCard({
           {med.amount} {med.unit}
           {med.amount > 1 ? "s" : ""} · {med.strength}
           {med.withFood ? " · with food" : ""}
+          {done ? " · ✓ taken" : skipped ? " · skipped" : ""}
         </div>
       </div>
       <div className="flex items-center gap-2 shrink-0">
-        <button
-          onClick={onSkip}
-          className={`h-9 w-9 rounded-full border flex items-center justify-center text-sm ${
-            skipped
-              ? "bg-[var(--warn)] text-white border-[var(--warn)]"
-              : "border-[var(--line)] text-[var(--muted)]"
-          }`}
-          aria-label="Skip dose"
-        >
-          ✕
-        </button>
-        <button
-          onClick={onTake}
-          className={`h-10 w-10 rounded-full flex items-center justify-center text-lg pop ${
+        {!done && (
+          <span
+            onClick={(e) => {
+              e.stopPropagation();
+              onSkip();
+            }}
+            role="button"
+            tabIndex={0}
+            className={`h-9 w-9 rounded-full border flex items-center justify-center text-sm ${
+              skipped
+                ? "bg-[var(--warn)] text-white border-[var(--warn)]"
+                : "border-[var(--line)] text-[var(--muted)]"
+            }`}
+            aria-label="Skip dose"
+          >
+            ✕
+          </span>
+        )}
+        <span
+          className={`h-10 w-10 rounded-full flex items-center justify-center text-xl shrink-0 ${
             done
-              ? "bg-[var(--good)] text-white"
+              ? "bg-[var(--good)] text-white pop"
               : "bg-[var(--primary-soft)] text-[var(--primary-ink)]"
           }`}
-          aria-label="Take dose"
         >
-          ✓
-        </button>
+          {done ? "✓" : ""}
+        </span>
       </div>
-    </div>
+    </button>
   );
 }
 
